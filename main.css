@@ -1,0 +1,60 @@
+#control_panel {
+    float: left;
+    width: 15%;
+    height: 800px;
+    background-color: black;
+}
+
+#divider {
+    float: left;
+    width: 5%;
+    height: 800px;
+}
+
+#control_panel button {
+    font-size: 20px;
+    width: 100%;
+}
+
+#control_panel button:hover {
+    cursor: pointer;
+}
+#information_panel {
+    background-color: gold;
+}
+
+#information_panel ul {
+    list-style: none;
+    padding: 5px;
+}
+
+.section {
+    background-color: black;
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+#header {
+    text-align: center;
+    background-color: black;
+    color: gold;
+    font-size: 24px;
+}
+
+#main {
+    float: left;
+    width: 80%;
+    height: 800px;
+}
+
+#main canvas {
+}
+
+#main input {
+    width: 100px;
+    height: 50px;
+}
+
