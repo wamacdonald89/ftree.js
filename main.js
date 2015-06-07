@@ -1,3 +1,4 @@
+//comment
 var maintree;
 function initialize() {
     var canvas = document.getElementById("canvas"),
