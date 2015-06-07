@@ -1,6 +1,8 @@
 var TREE = (function () {
     "use strict";
     var uID = 0,
+        
+        //TODO: Add data structure to store: First, Middle, Last Name, DOB, Age, etc.
         Tree = function (text, parentId, width, height, color, bgcolor, treeData) {
             this.uid = uID += 1;
             this.parentId = parentId || -1;
@@ -20,10 +22,18 @@ var TREE = (function () {
             this.children = [];
         };
 
+    /**
+     * Gets the vertical level of the tree.
+     * @return {number} The number of levels from the root node.
+     */
     Tree.prototype.getLevel = function () {
         return this.parentId === -1 ? 0 : this.parentTree.getLevel() + 1;
     };
 
+    /**
+     * Sets the text color of the node.
+     * @param {string} color The color of the node.
+     */
     Tree.prototype.setColor = function (color) {
         this.color = color;
     };
