@@ -135,7 +135,6 @@ var TREE = (function () {
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         },
 
-        //TODO: Fix draw to fit tree to left-align to canvas.
         //TODO: Refactor firstwalk, secondwalk, apportion to be more readable, consise.
         draw: function (context, tree) {
             var config = {
