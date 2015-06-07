@@ -1,7 +1,6 @@
 var TREE = (function () {
     "use strict";
     var uID = 0,
-        
         //TODO: Add data structure to store: First, Middle, Last Name, DOB, Age, etc.
         Tree = function (text, parentId, width, height, color, bgcolor, treeData) {
             this.uid = uID += 1;
@@ -38,6 +37,10 @@ var TREE = (function () {
         this.color = color;
     };
 
+    /**
+     * Sets the background color of the node.
+     * @param {string} color The background color of the node.
+     */
     Tree.prototype.setbgColor = function (color) {
         this.bgcolor = color;
     };
