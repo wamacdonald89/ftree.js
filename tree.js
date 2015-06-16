@@ -1,7 +1,11 @@
+//TREE.js is a library for creating and drawing properly displayed family trees on the HTML canvas element.
+//This is a work in progress.
+//Authors: Andy MacDonald
+//16 June 2015
+//--------------------------------------------------------------------------------------------------------
 var TREE = (function () {
     "use strict";
     var uID = 0,
-        //TODO: Add data structure to store: First, Middle, Last Name, DOB, Age, etc.
         Tree = function (text, parentId, width, height, color, bgcolor, treeData) {
             this.uid = uID += 1;
             this.parentId = parentId || -1;
@@ -23,28 +27,32 @@ var TREE = (function () {
 
     /**
      * Gets the vertical level of the tree.
-     * @return {number} The number of levels from the root node.
+     * @returns {*} A number representing the vertical level of the tree.
      */
     Tree.prototype.getLevel = function () {
         return this.parentId === -1 ? 0 : this.parentTree.getLevel() + 1;
     };
 
     /**
-     * Sets the text color of the node.
-     * @param {string} color The color of the node.
+     * Sets the text color of the tree node.
+     * @param color The color to change it to.
      */
     Tree.prototype.setColor = function (color) {
         this.color = color;
     };
 
     /**
-     * Sets the background color of the node.
-     * @param {string} color The background color of the node.
+     * Sets the background color of the tree node.
+     * @param color The color to change it to.
      */
     Tree.prototype.setbgColor = function (color) {
         this.bgcolor = color;
     };
 
+    /**
+     * Visually changes the style of the node if it is 'selected'.
+     * @param bool A true or false value representing if node is selected or not.
+     */
     Tree.prototype.selected = function (bool) {
         if (bool) {
             this.setColor("white");
@@ -55,22 +63,44 @@ var TREE = (function () {
         }
     };
 
+    /**
+     * Returns the number of children of this tree.
+     * @returns {Number} The number of children.
+     */
     Tree.prototype.numChildren = function () {
         return this.children.length;
     };
 
+    /**
+     * Returns the left sibling of this tree.
+     * @returns {*} The left sibling or null.
+     */
     Tree.prototype.getLeftSibling = function () {
         return this.leftNeighbor && this.leftNeighbor.parentTree === this.parentTree ? this.leftNeighbor : null;
     };
 
+    /**
+     * Returns the right sibling of this tree.
+     * @returns {*} The right sibling tree or null.
+     */
     Tree.prototype.getRightSibling = function () {
         return this.rightNeighbor && this.rightNeighbor.parentTree === this.parentTree ? this.rightNeighbor : null;
     };
 
+    /**
+     * Returns the child at a specified index.
+     * @param index The specified index.
+     * @returns {*} The child if found or null.
+     */
     Tree.prototype.getChildAt = function (index) {
         return this.children[index];
     };
 
+    /**
+     * Searches children and returns a tree by UID.
+     * @param id The UID to search for.
+     * @returns {*} The child if found or null.
+     */
     Tree.prototype.getChild = function (id) {
         var i;
         for (i = 0; i < this.children.length; i++) {
@@ -80,26 +110,47 @@ var TREE = (function () {
         }
     };
 
+    /**
+     * Returns an X value representing the center location of all this tree's children.
+     * @returns {*} The center X value.
+     */
     Tree.prototype.getChildrenCenter = function () {
         var firstChild = this.getFirstChild(),
             lastChild = this.getLastChild();
         return firstChild.prelim + (lastChild.prelim - firstChild.prelim + lastChild.width) / 2;
     };
 
+    /**
+     * Return the first child of this tree.
+     * @returns {Object} The child node.
+     */
     Tree.prototype.getFirstChild = function () {
         return this.getChildAt(0);
     };
 
+    /**
+     * Gets the last child of this tree.
+     * @returns {Object} The child node.
+     */
     Tree.prototype.getLastChild = function () {
         return this.getChildAt(this.numChildren() - 1);
     };
 
+    /**
+     * Adds a tree node to the children to this tree.
+     * @param tree The tree to be added.
+     */
     Tree.prototype.addChild = function (tree) {
         tree.parentTree = this;
         tree.parentId = this.uid;
         this.children.push(tree);
     };
 
+    /**
+     * Find and return a descendant by the UID.
+     * @param id The UID to search for.
+     * @returns {*} The found tree node or null if not found.
+     */
     Tree.prototype.getDescendent = function (id) {
         var children = this.children;
         var found;
@@ -117,10 +168,22 @@ var TREE = (function () {
     };
 
     return {
+
+        /**
+         * Create and return a new tree.
+         * @constructor
+         * @param text The textual representation of the tree.
+         * @returns {Tree} The newly created tree.
+         */
         create: function (text) {
             return new Tree(text);
         },
 
+        /**
+         * Removes a tree from it's parents list of children. This effectively removes the tree and all of its
+         * descendants from an existing tree.
+         * @param tree The tree to be removed.
+         */
         destroy: function (tree) {
             if (!tree.parentTree) {
                 alert("Removing root node not supported at this time");
@@ -135,6 +198,11 @@ var TREE = (function () {
             }
         },
 
+        /**
+         * Get an array of all nodes in a tree.
+         * @param tree The tree.
+         * @returns {Array} An array of tree nodes.
+         */
         getNodeList: function (tree) {
             var nodeList = [];
             nodeList.push(tree);
@@ -144,11 +212,19 @@ var TREE = (function () {
             return nodeList;
         },
 
+        /**
+         * Clears the canvas.
+         * @param context The 2-d context of an html canvas element.
+         */
         clear: function (context) {
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         },
 
-        //TODO: Refactor firstwalk, secondwalk, apportion to be more readable, consise.
+        /**
+         * Draws a well-formed tree on a canvas.
+         * @param context The 2-d context of a canvas html element.
+         * @param tree The tree that will be drawn.
+         */
         draw: function (context, tree) {
             var config = {
                     maxDepth: 100,
@@ -164,14 +240,29 @@ var TREE = (function () {
                 rootXOffset = 0,
                 rootYOffset = 0,
 
+                /**
+                 * Saves the height of a tree at a specified level.
+                 * @param tree The tree.
+                 * @param level The current vertical level of the tree.
+                 */
                 setLevelHeight = function (tree, level) {
                     maxLevelHeight[level] = tree.height;
                 },
 
+                /**
+                 * Saves the width of a tree at a specified level.
+                 * @param tree The tree.
+                 * @param level The current vertical level of the tree.
+                 */
                 setLevelWidth = function (tree, level) {
                     maxLevelWidth[level] = tree.width;
                 },
 
+                /**
+                 * Sets the neighbors of the tree.
+                 * @param tree The specified tree
+                 * @param level The vertical level of the tree.
+                 */
                 setNeighbors = function (tree, level) {
                     tree.leftNeighbor = previousLevelTree[level];
                     if (tree.leftNeighbor)
@@ -179,8 +270,13 @@ var TREE = (function () {
                     previousLevelTree[level] = tree;
                 },
 
-            //Determine the leftmost descendent of a node at a given depth.
-            //This seems to be incorrect
+                /**
+                 * Returns the leftmost descendant of the tree.
+                 * @param tree The specified tree.
+                 * @param level The vertical level of the tree.
+                 * @param maxlevel The maximum level in which to stop searching.
+                 * @returns {*} The leftmost descendant if found, or null.
+                 */
                 getLeftMost = function (tree, level, maxlevel) {
                     if (level >= maxlevel) return tree;
                     if (tree.numChildren() === 0) return null;
@@ -194,62 +290,72 @@ var TREE = (function () {
                     return null;
                 },
 
+                /**
+                 * Gets the width of the tree.
+                 * @param tree The specified tree.
+                 * @returns {number} The width of the tree.
+                 */
                 getNodeSize = function (tree) {
                     return tree.width;
                 },
 
-            //TODO: This needs to be reworked...such ulgy...much sadness
+                /**
+                 * Part of the first traversal of the tree for positioning. Smaller subtrees that could float between
+                 * two adjacent larger subtrees are evenly spaced out.
+                 * @param tree
+                 * @param level
+                 */
                 apportion = function (tree, level) {
                     var firstChild = tree.getFirstChild(),
                         firstChildLeftNeighbor = firstChild.leftNeighbor,
-                        modifierSumRight,
-                        modifierSumLeft,
-                        rightAncestor,
-                        leftAncestor,
-                        totalGap,
-                        subtreeAux,
-                        numSubtrees,
-                        subtreeMoveAux,
-                        singleGap;
-                    for (var k = config.maxDepth - level, j = 1; firstChild && firstChildLeftNeighbor && j <= k;) {
-                        modifierSumRight = 0;
-                        modifierSumLeft = 0;
-                        rightAncestor = firstChild;
-                        leftAncestor = firstChildLeftNeighbor;
+                        j = 1;
+                    for (var k = config.maxDepth - level; firstChild != null && firstChildLeftNeighbor != null && j <= k;) {
+                        var modifierSumRight = 0;
+                        var modifierSumLeft = 0;
+                        var rightAncestor = firstChild;
+                        var leftAncestor = firstChildLeftNeighbor;
                         for (var l = 0; l < j; l++) {
                             rightAncestor = rightAncestor.parentTree;
                             leftAncestor = leftAncestor.parentTree;
                             modifierSumRight += rightAncestor.modifier;
                             modifierSumLeft += leftAncestor.modifier;
                         }
-                        totalGap = (firstChildLeftNeighbor.prelim + modifierSumLeft + getNodeSize(firstChildLeftNeighbor) + config.subtreeSeparation) - (firstChild.prelim + modifierSumRight);
+                        var totalGap = (firstChildLeftNeighbor.prelim + modifierSumLeft + getNodeSize(firstChildLeftNeighbor) + config.subtreeSeparation) - (firstChild.prelim + modifierSumRight);
                         if (totalGap > 0) {
-                            subtreeAux = tree;
-                            numSubtrees = 0;
-                            while(subtreeAux && subtreeAux != leftAncestor){
+                            var subtreeAux = tree;
+                            var numSubtrees = 0;
+                            for (; subtreeAux != null && subtreeAux != leftAncestor; subtreeAux = subtreeAux.getLeftSibling()) {
                                 numSubtrees++;
-                                subtreeAux = subtreeAux.getLeftSibling();
                             }
-                            if (subtreeAux) {
-                                subtreeMoveAux = tree;
-                                singleGap = totalGap / numSubtrees;
-                                while(subtreeMoveAux != leftAncestor){
+                            if (subtreeAux != null) {
+                                var subtreeMoveAux = tree;
+                                var singleGap = totalGap / numSubtrees;
+                                for (; subtreeMoveAux != leftAncestor; subtreeMoveAux = subtreeMoveAux.getLeftSibling()) {
                                     subtreeMoveAux.prelim += totalGap;
                                     subtreeMoveAux.modifier += totalGap;
                                     totalGap -= singleGap;
-                                    subtreeMoveAux = subtreeMoveAux.getLeftSibling();
                                 }
                             }
                         }
-                        if (!firstChild.numChildren())
-                            firstChild = getLeftMost(tree, 0, ++j);
-                        else
+                        j++;
+                        if (firstChild.numChildren() == 0) {
+                            firstChild = getLeftMost(tree, 0, j);
+                        } else {
                             firstChild = firstChild.getFirstChild();
-                        if (firstChild)
+                        }
+                        if (firstChild != null) {
                             firstChildLeftNeighbor = firstChild.leftNeighbor;
+                        }
                     }
                 },
 
+                /**
+                 * A postorder traversal of the tree. Each subtree is manipulated recursively from the bottom to top
+                 * and left to right, positioning the rigid units that form each subtree until none are touching each
+                 * other. Smaller subtrees are combined, forming larger subtrees until the root has been reached.
+                 * @param tree
+                 * @param level
+                 */
                 firstWalk = function (tree, level) {
                     var leftSibling = null;
                     tree.xPos = 0;
@@ -287,28 +393,28 @@ var TREE = (function () {
                     }
                 },
 
+                /**
+                 * A preorder traversal. Each node is given it's final X,Y coordinates by summing the preliminary
+                 * coordinate and the modifiers of all of its ancestor trees.
+                 * @param tree The tree that will be traversed.
+                 * @param level The vertical level of the tree.
+                 * @param X The X value of the tree.
+                 * @param Y The Y value of the tree.
+                 */
                 secondWalk = function (tree, level, X, Y) {
-                    if (level <= config.maxDepth) {
-                        tree.xPos = rootXOffset + tree.prelim + X;
-                        tree.yPos = rootYOffset + Y;
-                        if (tree.numChildren())
-                            secondWalk(tree.getFirstChild(), level + 1, X + tree.modifier, Y + maxLevelHeight[level] + config.levelSeparation);
-                        var rightSibling = tree.getRightSibling();
-                        if (rightSibling)
-                            secondWalk(rightSibling, level, X, Y);
-                    }
+                    tree.xPos = rootXOffset + tree.prelim + X;
+                    tree.yPos = rootYOffset + Y;
+                    if (tree.numChildren())
+                        secondWalk(tree.getFirstChild(), level + 1, X + tree.modifier, Y + maxLevelHeight[level] + config.levelSeparation);
+                    var rightSibling = tree.getRightSibling();
+                    if (rightSibling)
+                        secondWalk(rightSibling, level, X, Y);
                 },
 
-                findMinX = function (tree) {
-                    var nodes = TREE.getNodeList(tree);
-                    var min = 0;
-                    for (var i = 0; i < nodes.length; i++){
-                        if(nodes[i].xPos < min)
-                            min = nodes[i].xPos;
-                    }
-                    return min;
-                },
-
+                /**
+                 * Assign X,Y position values to the tree and it's descendants.
+                 * @param tree The tree to be positioned.
+                 */
                 positionTree = function (tree) {
                     maxLevelHeight = [];
                     maxLevelWidth = [];
@@ -317,10 +423,12 @@ var TREE = (function () {
                     rootXOffset = config.topXAdjustment + tree.xPos;
                     rootYOffset = config.topYAdjustment + tree.yPos;
                     secondWalk(tree, 0, 0, 0);
-                    rootXOffset += Math.abs(findMinX(tree));
-                    secondWalk(tree, 0, 0, 0);
                 },
 
+                /**
+                 * Draw the tree and it's descendants on the canvass.
+                 * @param tree The tree that will be drawn.
+                 */
                 drawNode = function (tree) {
                     var x = tree.xPos,
                         y = tree.yPos,
