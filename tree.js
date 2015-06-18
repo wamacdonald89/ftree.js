@@ -423,6 +423,18 @@ var TREE = (function () {
                     rootXOffset = config.topXAdjustment + tree.xPos;
                     rootYOffset = config.topYAdjustment + tree.yPos;
                     secondWalk(tree, 0, 0, 0);
+                    rootXOffset = Math.abs(getMinX(tree)); //Align to left
+                    secondWalk(tree, 0, 0, 0);
+                },
+
+                getMinX = function (tree) {
+                    var nodes = TREE.getNodeList(tree);
+                    var min = 0;
+                    for (var i = 0; i < nodes.length; i++){
+                        if (nodes[i].xPos < min)
+                            min = nodes[i].xPos;
+                    }
+                    return min;
                 },
 
                 /**

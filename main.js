@@ -7,7 +7,9 @@ function initialize() {
         nodes = TREE.getNodeList(tree),
         currNode = tree,
         add_child_button = document.getElementById("add_child"),
-        remove_node = document.getElementById("remove_node");
+        remove_node = document.getElementById("remove_node"),
+        zoom_in = document.getElementById("zoom_in"),
+        zoom_out = document.getElementById("zoom_out");
 
     canvas.addEventListener("click", function (event) {
         var x = event.pageX - canvas.offsetLeft,
@@ -48,6 +50,22 @@ function initialize() {
         TREE.destroy(currNode);
         TREE.clear(context);
         nodes = TREE.getNodeList(tree);
+        TREE.draw(context, tree);
+    }, false);
+    zoom_in.addEventListener('click', function (event) {
+        for (var i = 0; i < nodes.length; i++){
+            nodes[i].width = nodes[i].width * 1.05;
+            nodes[i].height = nodes[i].height * 1.05;
+        }
+        TREE.clear(context);
+        TREE.draw(context, tree);
+    }, false);
+    zoom_out.addEventListener('click', function (event) {
+        for (var i = 0; i < nodes.length; i++){
+            nodes[i].width = nodes[i].width * 0.95;
+            nodes[i].height = nodes[i].height * 0.95;
+        }
+        TREE.clear(context);
         TREE.draw(context, tree);
     }, false);
     context.canvas.width = document.getElementById("main").offsetWidth;
