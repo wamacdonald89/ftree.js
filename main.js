@@ -54,9 +54,11 @@ function initialize() {
     }, false);
     zoom_in.addEventListener('click', function (event) {
         for (var i = 0; i < nodes.length; i++){
-            nodes[i].width = nodes[i].width * 1.05;
-            nodes[i].height = nodes[i].height * 1.05;
+            nodes[i].width *= 1.05;
+            nodes[i].height *= 1.05;
         }
+        TREE.config.width *= 1.05;
+        TREE.config.height *= 1.05;
         TREE.clear(context);
         TREE.draw(context, tree);
     }, false);
@@ -65,6 +67,8 @@ function initialize() {
             nodes[i].width = nodes[i].width * 0.95;
             nodes[i].height = nodes[i].height * 0.95;
         }
+        TREE.config.width *= 0.95;
+        TREE.config.height *= 0.95;
         TREE.clear(context);
         TREE.draw(context, tree);
     }, false);

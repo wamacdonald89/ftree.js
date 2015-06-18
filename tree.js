@@ -6,14 +6,20 @@
 var TREE = (function () {
     "use strict";
     var uID = 0,
+        config = {
+            width: 100,
+            height: 50,
+            color: "black",
+            bgcolor: "white"
+        },
         Tree = function (text, parentId, width, height, color, bgcolor, treeData) {
             this.uid = uID += 1;
             this.parentId = parentId || -1;
             this.text = text;
-            this.width = width || 100;
-            this.height = height || 50;
-            this.color = color || "black";
-            this.bgcolor = bgcolor || "white";
+            this.width = width || config.width;
+            this.height = height || config.height;
+            this.color = color || config.color;
+            this.bgcolor = bgcolor || config.bgcolor;
             this.treeData = treeData || {};
             this.xPos = 0;
             this.yPos = 0;
@@ -169,6 +175,7 @@ var TREE = (function () {
 
     return {
 
+        config : config,
         /**
          * Create and return a new tree.
          * @constructor
